@@ -1,0 +1,602 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ==========================================================
+   DESIGN TOKENS
+   Semantic colours switch with the .dark class. Components use
+   bg-bg, text-fg, text-muted, border-line etc. and never need
+   a dark: prefix for the basics.
+   ========================================================== */
+:root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --bg-alt: #f5f5f7;
+  --surface: #ffffff;
+  --surface-2: #fbfbfd;
+  --fg: #1d1d1f;
+  --muted: #6e6e73;
+  --faint: #86868b;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-soft: rgba(0, 113, 227, 0.1);
+  --cyan: #00b8dc;
+  --spark: #ff7900;
+
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-solid: #ffffff;
+  --glass-border: rgba(0, 0, 0, 0.06);
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 30px rgba(0, 0, 0, 0.06);
+  --shadow-lift: 0 2px 6px rgba(0, 0, 0, 0.05), 0 24px 60px rgba(0, 0, 0, 0.12);
+  --shadow-hero: 0 40px 120px -30px rgba(10, 40, 110, 0.45);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --header-h: 56px;
+  --orb-opacity: 0.55;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #000000;
+  --bg-alt: #111113;
+  --surface: #161618;
+  --surface-2: #1d1d1f;
+  --fg: #f5f5f7;
+  --muted: #a1a1a6;
+  --faint: #6e6e73;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+
+  --accent: #2997ff;
+  --accent-hover: #4aa8ff;
+  --accent-soft: rgba(41, 151, 255, 0.14);
+  --cyan: #3be0ff;
+  --spark: #ff8a1f;
+
+  --glass: rgba(22, 22, 24, 0.72);
+  --glass-solid: #161618;
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 30px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 30px 80px rgba(0, 0, 0, 0.7);
+  --shadow-hero: 0 40px 140px -30px rgba(41, 151, 255, 0.4);
+  --orb-opacity: 0.9;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-cyan: var(--cyan);
+  --color-spark: var(--spark);
+  --color-glass: var(--glass);
+
+  --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont,
+    "Inter", system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-lift: var(--shadow-lift);
+}
+
+/* ==========================================================
+   BASE
+   ========================================================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.47;
+  letter-spacing: -0.011em; /* body text: slightly tight, Apple-like */
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  transition: background-color 0.5s var(--ease-out), color 0.5s var(--ease-out);
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* No 300ms tap delay, and instant press feedback on every control */
+a,
+button,
+[role="button"],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+button:not(:disabled),
+[role="button"] {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+/* ==========================================================
+   TYPOGRAPHY
+   Tracking is size-specific: big type tightens, small type opens.
+   Responsive fluid clamp values tuned for mobile, tab, and desktop.
+   ========================================================== */
+.t-hero {
+  font-size: clamp(2rem, 1.2rem + 4.2vw, 5.25rem);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+}
+.t-display {
+  font-size: clamp(1.875rem, 1.1rem + 3.2vw, 4.25rem);
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.t-title {
+  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.75rem);
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.032em;
+}
+.t-h3 {
+  font-size: clamp(1.1875rem, 1.05rem + 0.6vw, 1.625rem);
+  line-height: 1.18;
+  font-weight: 650;
+  letter-spacing: -0.022em;
+}
+.t-lead {
+  font-size: clamp(1.0625rem, 0.98rem + 0.5vw, 1.45rem);
+  line-height: 1.36;
+  font-weight: 450;
+  letter-spacing: -0.018em;
+}
+.t-body {
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  letter-spacing: -0.011em;
+}
+.t-small {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  letter-spacing: -0.003em;
+}
+.t-caption {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  letter-spacing: 0.002em;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+.text-pretty {
+  text-wrap: pretty;
+}
+
+/* Brand gradient text (used once per page at most) */
+.grad-text {
+  background: linear-gradient(100deg, var(--accent) 0%, var(--cyan) 45%, var(--spark) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: grad-shift 8s ease-in-out infinite alternate;
+}
+@keyframes grad-shift {
+  to {
+    background-position: 100% 0;
+  }
+}
+
+/* ==========================================================
+   MATERIALS
+   Heavier material = structure (nav, sheets).
+   Lighter material = single floating accents. Never stack two.
+   ========================================================== */
+.material {
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+  border: 1px solid var(--glass-border);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* ==========================================================
+   SURFACES + CURSOR SPOTLIGHT
+   ========================================================== */
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.5s var(--ease-out), border-color 0.5s var(--ease-out),
+    background-color 0.5s var(--ease-out);
+}
+.card-flat {
+  background: var(--bg-alt);
+  border-radius: 28px;
+  position: relative;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    box-shadow: var(--shadow-lift);
+    border-color: var(--line-strong);
+  }
+}
+
+/* ==========================================================
+   BUTTONS
+   Feedback starts on pointer-down (:active), not on release.
+   ========================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0 1.6rem;
+  border-radius: 999px;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: -0.011em;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out),
+    box-shadow 0.4s var(--ease-out), transform 0.18s var(--ease-out);
+  will-change: transform;
+}
+.btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.08s;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 6px 24px -6px var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 10px 34px -6px var(--accent);
+}
+.btn-secondary {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.btn-secondary:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.btn-ghost {
+  color: var(--accent);
+  padding: 0 0.25rem;
+  min-height: 44px;
+}
+.btn-ghost:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.btn-light {
+  background: #fff;
+  color: #1d1d1f;
+}
+.btn-light:hover {
+  background: #f2f2f4;
+}
+.btn-sm {
+  min-height: 36px;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+}
+
+/* ==========================================================
+   FORMS
+   ========================================================== */
+.field {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  font-size: 1rem;
+  transition: border-color 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out);
+}
+.field::placeholder {
+  color: var(--faint);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+/* Inputs with a leading icon (e.g. the careers search).
+   `.field` is un-layered CSS, so it beats Tailwind's `pl-*` utilities
+   (they live in @layer utilities). That is what made the text sit on top
+   of the search icon. A dedicated class fixes it without !important. */
+.field.field-icon {
+  padding-left: 3rem;
+}
+.field[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  margin-right: -2px;
+  cursor: pointer;
+  background: no-repeat center / contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E");
+}
+select.field {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+}
+.label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--fg);
+}
+
+/* ==========================================================
+   LAYOUT HELPERS
+   ========================================================== */
+.wrap {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3.5vw, 2rem);
+}
+.wrap-narrow {
+  width: 100%;
+  max-width: 980px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 3.5vw, 2rem);
+}
+.section {
+  padding-block: clamp(3.5rem, 6.5vw, 7.5rem);
+}
+
+/* ==========================================================
+   AMBIENT MOTION (CSS-only, runs on the compositor)
+   ========================================================== */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.animate-marquee {
+  animation: marquee 48s linear infinite;
+}
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #30d158;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #30d158;
+  animation: pulse-ring 2s var(--ease-out) infinite;
+}
+
+/* Hide scrollbars on the draggable rail */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* View-transition circle reveal for the theme toggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* ==========================================================
+   ACCESSIBILITY: reduced motion
+   ========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-marquee {
+    animation: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --line: rgba(0, 0, 0, 0.3);
+    --muted: #4a4a4f;
+  }
+  .dark {
+    --line: rgba(255, 255, 255, 0.35);
+    --muted: #d1d1d6;
+  }
+}
+
+/* Mask used by headline reveals: text slides up out of a clipped line box.
+   The padding/negative margin keeps descenders (g, y, p) from being cut. */
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-top: 0.04em;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+/* Navigation bar: heavy translucent material, bottom hairline only */
+.nav-bg {
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+  border-bottom: 1px solid var(--glass-border);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .nav-bg {
+    background: var(--glass-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* While the theme circle-reveal runs, colours must switch instantly so the
+   snapshot of the "new" theme is the real thing and not a half-faded state. */
+html.vt *,
+html.vt *::before,
+html.vt *::after {
+  transition: none !important;
+}
+
+/* ==========================================================
+   HERO AMBIENCE
+   Radial gradients (not CSS blur) so the animated orbs stay cheap.
+   ========================================================== */
+.hero-grid {
+  background-image: radial-gradient(var(--line-strong) 1px, transparent 1px);
+  background-size: 32px 32px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 52% at 50% 28%, #000 15%, transparent 75%);
+  mask-image: radial-gradient(ellipse 62% 52% at 50% 28%, #000 15%, transparent 75%);
+  opacity: 0.55;
+}
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  opacity: var(--orb-opacity);
+  will-change: transform;
+}
+.orb-a {
+  width: 820px;
+  height: 820px;
+  left: 50%;
+  top: -300px;
+  margin-left: -700px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 42%, transparent), transparent 70%);
+}
+.orb-b {
+  width: 700px;
+  height: 700px;
+  left: 50%;
+  top: -220px;
+  margin-left: 80px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--cyan) 38%, transparent), transparent 70%);
+}
+.orb-c {
+  width: 520px;
+  height: 520px;
+  left: 50%;
+  top: 120px;
+  margin-left: -120px;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--spark) 26%, transparent), transparent 70%);
+}
+@media (max-width: 640px) {
+  .orb-a { width: 520px; height: 520px; margin-left: -420px; top: -180px; }
+  .orb-b { width: 460px; height: 460px; margin-left: -20px; top: -140px; }
+  .orb-c { width: 340px; height: 340px; margin-left: -170px; top: 160px; }
+}
+
+/* Reduced motion: the marquee stops, so let people scroll it by hand */
+@media (prefers-reduced-motion: reduce) {
+  .mq-wrap {
+    overflow-x: auto;
+  }
+}
+/* inputs lift very slightly when focused */
+.field:focus {
+  transform: translateY(-1px);
+}
+
+/* ==========================================================
+   SERVICES RAIL: card hover lift
+   ========================================================== */
+.svc-card {
+  transition: transform 0.7s var(--ease-out), box-shadow 0.7s var(--ease-out);
+}
+@media (hover: hover) {
+  .svc-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svc-card {
+    transition: none;
+  }
+}

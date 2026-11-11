@@ -31,8 +31,6 @@ export const company = {
   social: {
     linkedin: "https://www.linkedin.com/company/tephron-global/",
     instagram: "https://www.instagram.com/tephron_global/",
-    facebook: "", // TODO(owner): your real Facebook page URL
-    x: "", // TODO(owner): your real X (Twitter) profile URL
   },
 
   founder: {
@@ -41,13 +39,6 @@ export const company = {
     linkedin: "", // TODO(owner): Dinesh G's personal LinkedIn profile URL
   },
 
-  // Real proof only. Each section appears automatically once it has entries.
-  //   testimonials: { quote, name, role, company }
-  //   clients:      { name, logo? }   (logo = path or URL; name is the fallback)
-  //   caseStudies:  { title, summary, result, href? }
-  testimonials: [],
-  clients: [],
-  caseStudies: [],
 };
 
 // Headline figures. Keep these true and consistent with `founded` above.
@@ -60,7 +51,3 @@ export const stats = [
 ];
 
 export const hasUk = Object.values(company.uk).some(Boolean);
-export const hasProof =
-  company.testimonials.length > 0 ||
-  company.clients.length > 0 ||
-  company.caseStudies.length > 0;

@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import AboutPage from "./components/AboutPage";
 import ServicesPage from "./components/ServicesPage";
+import ServiceDetailPage from "./components/ServiceDetailPage";
 import Career from "./components/Career";
 import GalleryPage from "./components/GalleryPage";
 import BlogPage from "./components/BlogPage";
@@ -102,6 +103,7 @@ const Shell = () => {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:slug" element={<ServiceDetailPage />} />
             <Route path="/careers" element={<Career />} />
             {hasGallery && <Route path="/gallery" element={<GalleryPage />} />}
             <Route path="/contact" element={<ContactPage />} />

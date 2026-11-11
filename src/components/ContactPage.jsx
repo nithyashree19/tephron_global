@@ -259,8 +259,17 @@ const ContactPage = () => {
                   </p>
                 )}
 
-                <button type="submit" disabled={status === "sending"} className="btn btn-primary w-full disabled:cursor-wait disabled:opacity-70">
-                  {status === "sending" ? "Sending…" : <>Submit inquiry <FiArrowRight aria-hidden="true" /></>}
+                <button type="submit" disabled={status === "sending"} className="btn btn-primary btn-submit w-full disabled:cursor-wait disabled:opacity-70">
+                  {status === "sending" ? (
+                    <span className="inline-flex items-center gap-2.5">
+                      <span aria-hidden="true" className="btn-spinner" />
+                      Sending…
+                    </span>
+                  ) : (
+                    <>
+                      Submit inquiry <FiArrowRight aria-hidden="true" className="btn-arrow" />
+                    </>
+                  )}
                 </button>
                 <p className="t-caption text-center text-muted">
                   By sending this form you agree to our{" "}

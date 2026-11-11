@@ -4,8 +4,6 @@ import { FiArrowUp, FiArrowUpRight } from "react-icons/fi";
 import {
   FaWhatsapp,
   FaInstagram,
-  FaFacebookF,
-  FaXTwitter,
   FaLinkedinIn,
 } from "react-icons/fa6";
 
@@ -24,8 +22,6 @@ const address = company.india.address;
 const socialLinks = [
   { name: "LinkedIn", icon: FaLinkedinIn, url: company.social.linkedin },
   { name: "Instagram", icon: FaInstagram, url: company.social.instagram },
-  { name: "Facebook", icon: FaFacebookF, url: company.social.facebook },
-  { name: "X", icon: FaXTwitter, url: company.social.x },
 ].filter((s) => s.url);
 
 const quickLinks = [

@@ -117,6 +117,7 @@ const ApplySheet = ({ job, onClose }) => {
   useLayoutEffect(() => {
     const previouslyFocused = document.activeElement;
     document.body.style.overflow = "hidden";
+    window.__lenis?.stop();
     const reduce = prefersReducedMotion();
     const phone = isPhone();
 
@@ -161,9 +162,23 @@ const ApplySheet = ({ job, onClose }) => {
       dragRef.current?.kill();
       gsap.killTweensOf([sheetEl, backdropEl]);
       document.body.style.overflow = "";
+      window.__lenis?.start();
       previouslyFocused?.focus?.();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Wheel / touch over the dimmed background must not scroll the page behind.
+  useEffect(() => {
+    const block = (e) => {
+      if (!sheet.current?.contains(e.target)) e.preventDefault();
+    };
+    window.addEventListener("wheel", block, { passive: false });
+    window.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      window.removeEventListener("wheel", block);
+      window.removeEventListener("touchmove", block);
+    };
   }, []);
 
   // Escape closes; Tab stays inside the dialog
@@ -273,7 +288,7 @@ const ApplySheet = ({ job, onClose }) => {
           </div>
         </div>
 
-        <div className="overflow-y-auto overscroll-contain border-t border-line px-7 pb-[max(1.75rem,env(safe-area-inset-bottom))] pt-6 sm:px-9">
+        <div data-lenis-prevent className="overflow-y-auto overscroll-contain border-t border-line px-7 pb-[max(1.75rem,env(safe-area-inset-bottom))] pt-6 sm:px-9">
           {submitted ? (
             <div className="py-10 text-center" role="status" aria-live="polite">
               <AnimatedCheck className="mx-auto text-[#30d158]" />

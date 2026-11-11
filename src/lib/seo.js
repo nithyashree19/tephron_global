@@ -1,5 +1,6 @@
 // Plain JS so both the app and scripts/prerender.mjs can use it.
 import { posts } from "./posts.js";
+import { servicesData, hasPage } from "./servicesData.js";
 
 export const SITE_URL = "https://www.tephronglobal.com";
 export const SITE_NAME = "Tephron Global";
@@ -82,6 +83,16 @@ for (const p of posts) {
     description: p.summary,
     h1: p.title,
     summary: p.summary,
+  };
+}
+
+// one entry per service page
+for (const s of servicesData.filter(hasPage)) {
+  pages[`/services/${s.slug}`] = {
+    title: `${s.title} | Tephron Global`,
+    description: s.lead,
+    h1: s.heading.join(" "),
+    summary: s.lead,
   };
 }
 

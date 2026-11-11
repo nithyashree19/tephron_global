@@ -12,6 +12,7 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import { SectionHead } from "./ui";
+import { servicesData, hasPage } from "../lib/servicesData";
 import {
   gsap,
   clip,
@@ -33,62 +34,25 @@ import {
 //   - images drift slightly against the drag for depth
 // =====================================================================
 
-const services = [
-  {
-    title: "Data entry and processing",
-    request: "Data entry and back-office operations",
-    description:
-      "Accurate data entry, large-scale record updates, and cleaning up messy data and product catalogues.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=75",
-    icon: FiDatabase,
-    tint: "from-[#0a3a8a] to-[#0a1d4a]",
-  },
-  {
-    title: "Customer support by phone, chat and email",
-    request: "Customer support (phone, chat and email)",
-    description:
-      "Round-the-clock support for your customers in any time zone, including airline and travel booking support.",
-    image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=75",
-    icon: FiUsers,
-    tint: "from-[#07607a] to-[#06283a]",
-  },
-  {
-    title: "Virtual assistants and sales support",
-    request: "Virtual assistants and sales support",
-    description:
-      "Assistants who build prospect lists, keep your CRM up to date and manage your product listings.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=75",
-    icon: FiHeadphones,
-    tint: "from-[#8a3d05] to-[#3a1a05]",
-  },
-  {
-    title: "Digital eBook conversions",
-    request: "eBook conversion and document digitisation",
-    description:
-      "Turning manuscripts, scans and handwritten pages into properly formatted eBooks.",
-    image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=75",
-    icon: FiBookOpen,
-    tint: "from-[#1d4f9a] to-[#0b1f40]",
-  },
-  {
-    title: "Healthcare administration",
-    request: "Healthcare administration and billing",
-    description:
-      "Back-office help for healthcare providers, such as keeping directories and records up to date.",
-    image: "https://images.unsplash.com/photo-1504813184591-01572f98c85f?auto=format&fit=crop&w=900&q=75",
-    icon: FiHeart,
-    tint: "from-[#0a6a6a] to-[#082f35]",
-  },
-  {
-    title: "Bookkeeping support",
-    request: "Bookkeeping support",
-    description:
-      "Matching transactions to receipts and organising expense records so your books stay tidy.",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=75",
-    icon: FiFileText,
-    tint: "from-[#4a2a9a] to-[#1a1040]",
-  },
-];
+// Real Tephron Global photos: drop files named after each slug (e.g.
+// data-entry.jpg) into src/assets/services/. No file = gradient card, no stock photo.
+const photos = import.meta.glob("../assets/services/*.{jpg,jpeg,png,webp,avif}", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+const photoFor = (slug) =>
+  Object.entries(photos).find(([p]) => p.split("/").pop().startsWith(slug))?.[1];
+
+const visuals = {
+  "data-operations": { icon: FiDatabase, tint: "from-[#0a3a8a] to-[#0a1d4a]" },
+  "omnichannel-support": { icon: FiUsers, tint: "from-[#07607a] to-[#06283a]" },
+  "virtual-assistance": { icon: FiHeadphones, tint: "from-[#8a3d05] to-[#3a1a05]" },
+  "ebook-conversions": { icon: FiBookOpen, tint: "from-[#1d4f9a] to-[#0b1f40]" },
+  "healthcare-admin": { icon: FiHeart, tint: "from-[#0a6a6a] to-[#082f35]" },
+  "financial-ledger": { icon: FiFileText, tint: "from-[#4a2a9a] to-[#1a1040]" },
+};
+const services = servicesData.map((s) => ({ ...s, ...visuals[s.slug] }));
 
 const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
   const root = useRef(null);
@@ -307,14 +271,17 @@ const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
                 className={`svc-card group relative h-[450px] w-[82vw] max-w-[340px] shrink-0 overflow-hidden rounded-[24px] bg-gradient-to-br ${s.tint} shadow-[var(--shadow-card)] sm:h-[490px] sm:max-w-[360px] md:h-[520px] md:w-[380px] md:max-w-[380px] md:rounded-[28px]`}
               >
                 {/* image is wider than the card so it can drift (parallax) */}
-                <img
-                  src={s.image}
-                  alt=""
-                  loading="lazy"
-                  draggable="false"
-                  onError={(e) => (e.currentTarget.style.display = "none")}
-                  className="svc-img absolute -left-[12%] top-0 h-full w-[124%] max-w-none object-cover"
-                />
+                {photoFor(s.slug) ? (
+                  <img
+                    src={photoFor(s.slug)}
+                    alt={s.title}
+                    loading="lazy"
+                    draggable="false"
+                    className="svc-img absolute -left-[12%] top-0 h-full w-[124%] max-w-none object-cover"
+                  />
+                ) : (
+                  <span aria-hidden="true" className="svc-img absolute -left-[12%] top-0 h-full w-[124%]" />
+                )}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/10"
@@ -327,14 +294,15 @@ const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
                 <div className="absolute inset-x-0 bottom-0 p-7 text-white">
                   <h3 className="t-h3">{s.title}</h3>
                   <p className="t-small mt-3 max-w-[34ch] text-white/80">{s.description}</p>
-                  <Link
-                    to={`/contact?service=${encodeURIComponent(s.request)}`}
-                    aria-label={`Request this service: ${s.title}`}
-                    className="t-small mt-5 inline-flex items-center gap-1.5 font-medium text-white transition-[gap] duration-300 hover:gap-2.5"
-                  >
-                    Request this service <FiArrowRight aria-hidden="true" />
-                  </Link>
+                  <span className="t-small mt-5 inline-flex items-center gap-1.5 font-medium text-white transition-[gap] duration-300 group-hover:gap-2.5">
+                    Explore service <FiArrowRight aria-hidden="true" />
+                  </span>
                 </div>
+                <Link
+                  to={`/services/${s.slug}`}
+                  aria-label={`Explore service: ${s.title}`}
+                  className="absolute inset-0 z-10 rounded-[inherit] focus-visible:outline-2 focus-visible:outline-white"
+                />
               </li>
             );
           })}

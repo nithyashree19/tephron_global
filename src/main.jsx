@@ -25,6 +25,8 @@ gsap.ticker.lagSmoothing(0)
 
 // Keep ScrollTrigger in sync
 lenis.on('scroll', ScrollTrigger.update)
+// lets components (e.g. the application modal) pause smooth scrolling
+window.__lenis = lenis
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

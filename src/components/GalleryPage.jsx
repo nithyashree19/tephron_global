@@ -1,10 +1,27 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PageHeader, CtaBand, Btn } from "./ui";
 import { gsap, clip, wipe, useMotion } from "../lib/motion";
 import { galleryImages } from "../lib/gallery";
 
 const GalleryPage = () => {
   const root = useRef(null);
+  const [open, setOpen] = useState(null);
+
+  useEffect(() => {
+    if (open === null) return;
+    const n = galleryImages.length;
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(null);
+      if (e.key === "ArrowRight") setOpen((i) => (i + 1) % n);
+      if (e.key === "ArrowLeft") setOpen((i) => (i - 1 + n) % n);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
 
   useMotion(() => {
     gsap.utils.toArray(".g-item", root.current).forEach((item, i) => {
@@ -34,10 +51,15 @@ const GalleryPage = () => {
 
       <section className="pb-[clamp(3rem,6vw,6rem)]">
         <div className="wrap grid auto-rows-[175px] grid-cols-2 gap-3 sm:auto-rows-[210px] md:auto-rows-[250px] lg:auto-rows-[270px] md:grid-cols-4 md:gap-4">
-          {galleryImages.map((g) => (
+          {galleryImages.map((g, idx) => (
             <figure
               key={g.image}
-              className={`g-item group relative overflow-hidden rounded-[24px] bg-bg-alt md:rounded-[28px] ${g.span}`}
+              onClick={() => setOpen(idx)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(idx))}
+              role="button"
+              tabIndex={0}
+              aria-label={`View full image: ${g.title}`}
+              className={`g-item group relative cursor-zoom-in overflow-hidden rounded-[24px] bg-bg-alt md:rounded-[28px] ${g.span}`}
             >
               <div className="g-img-zoom absolute inset-0">
                 <img
@@ -62,6 +84,27 @@ const GalleryPage = () => {
           ))}
         </div>
       </section>
+
+      {open !== null && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={galleryImages[open].title}
+          onClick={() => setOpen(null)}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/90 p-4"
+        >
+          <img
+            src={galleryImages[open].image}
+            alt={galleryImages[open].title}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[82vh] max-w-full rounded-lg object-contain"
+          />
+          <p className="mt-4 text-white">{galleryImages[open].title}</p>
+          <button type="button" aria-label="Close" onClick={() => setOpen(null)} className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-2xl text-white">×</button>
+          <button type="button" aria-label="Previous image" onClick={(e) => { e.stopPropagation(); setOpen((open - 1 + galleryImages.length) % galleryImages.length); }} className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl text-white">‹</button>
+          <button type="button" aria-label="Next image" onClick={(e) => { e.stopPropagation(); setOpen((open + 1) % galleryImages.length); }} className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-2xl text-white">›</button>
+        </div>
+      )}
 
       <CtaBand
         title="Join our growing team."

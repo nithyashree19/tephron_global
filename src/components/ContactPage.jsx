@@ -1,48 +1,66 @@
-import { useRef, useState } from "react";
-import { FiMail, FiPhone, FiMapPin, FiClock, FiArrowRight } from "react-icons/fi";
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { FiMail, FiPhone, FiMapPin, FiClock, FiBriefcase, FiArrowRight } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa6";
 
 import { Btn, PageHeader, AnimatedCheck } from "./ui";
-import { gsap, clip, wipe, useMotion } from "../lib/motion";
+import { gsap, clip, wipe, useMotion, prefersReducedMotion } from "../lib/motion";
+import { serviceOptions } from "../lib/serviceOptions";
+import { company } from "../lib/company";
+import { sendForm } from "../lib/submit";
 
 const emptyForm = {
   name: "",
   email: "",
   phone: "",
   company: "",
-  service: "Customer Support Outsourcing",
+  service: serviceOptions[0],
   message: "",
+  website: "", // honeypot: hidden from people, bots fill it in
 };
 
 const details = [
-  {
-    icon: FiMapPin,
-    label: "Operations headquarters",
-    value: "1st West Street, Mangammal Salai, Pothigai Nagar, Tenkasi - 627811, Tamil Nadu, India",
-  },
+  { icon: FiMapPin, label: company.india.label, value: company.india.address },
   {
     icon: FiPhone,
     label: "Phone and calling support",
-    value: "+91 83003 78470",
-    href: "tel:+918300378470",
+    value: company.phone.display,
+    href: `tel:${company.phone.tel}`,
   },
   {
     icon: FiMail,
     label: "Official inquiries",
-    value: "tephronglobal@gmail.com",
-    href: "mailto:tephronglobal@gmail.com",
+    value: company.email,
+    href: `mailto:${company.email}`,
   },
-  {
-    icon: FiClock,
-    label: "Coverage window",
-    value: "24/7/365 dedicated client operations",
-  },
+  { icon: FiClock, label: "Coverage window", value: "24/7/365 dedicated client operations" },
 ];
+
+// UK block: each line appears once it is filled in (src/lib/company.js)
+const ukDetails = [
+  company.uk.address && { icon: FiMapPin, label: "United Kingdom office", value: company.uk.address },
+  company.uk.phone && {
+    icon: FiPhone,
+    label: "UK phone",
+    value: company.uk.phone,
+    href: `tel:${company.uk.phone.replace(/[^\d+]/g, "")}`,
+  },
+  company.uk.hours && { icon: FiClock, label: "UK working hours", value: company.uk.hours },
+  company.uk.companyNumber && {
+    icon: FiBriefcase,
+    label: "Company number",
+    value: company.uk.companyNumber,
+  },
+].filter(Boolean);
 
 const ContactPage = () => {
   const root = useRef(null);
-  const [form, setForm] = useState(emptyForm);
-  const [submitted, setSubmitted] = useState(false);
+  const { search } = useLocation();
+  const asked = new URLSearchParams(search).get("service");
+  const requested = serviceOptions.includes(asked) ? asked : null;
+  const [form, setForm] = useState({ ...emptyForm, service: requested || emptyForm.service });
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const [error, setError] = useState("");
 
   useMotion(() => {
     const cards = gsap.utils.toArray(".contact-in", root.current);
@@ -55,15 +73,37 @@ const ContactPage = () => {
       ease: "power4.out",
       stagger: 0.07,
       delay: 1.1,
+      clearProps: "transform,opacity", // leave nothing behind on the controls
     });
   }, root);
+
+  // Arriving from a "Request this service" link: bring the form into view
+  useEffect(() => {
+    if (!requested) return;
+    const t = setTimeout(() => {
+      document.getElementById("inquiry-form")?.scrollIntoView({
+        behavior: prefersReducedMotion() ? "auto" : "smooth",
+        block: "center",
+      });
+    }, 900);
+    return () => clearTimeout(t);
+  }, [requested]);
 
   const handleChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (status === "sending") return;
+    setStatus("sending");
+    setError("");
+    try {
+      await sendForm({ type: "inquiry", ...form });
+      setStatus("sent");
+    } catch (err) {
+      setError(err.message);
+      setStatus("error");
+    }
   };
 
   return (
@@ -85,7 +125,7 @@ const ContactPage = () => {
             </p>
 
             <dl className="mt-8 space-y-6">
-              {details.map((d) => {
+              {[...details, ...ukDetails].map((d) => {
                 const Icon = d.icon;
                 return (
                   <div key={d.label} className="flex items-start gap-4">
@@ -110,7 +150,7 @@ const ContactPage = () => {
             </dl>
 
             <a
-              href="https://wa.me/918300378470?text=Hello%20Tephron%20Global%2C%20I%20would%20like%20to%20discuss%20a%20project."
+              href={`https://wa.me/${company.phone.whatsapp}?text=Hello%20Tephron%20Global%2C%20I%20would%20like%20to%20discuss%20a%20project.`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn mt-9 w-full bg-[#25D366] text-white hover:bg-[#1fb957]"
@@ -121,8 +161,14 @@ const ContactPage = () => {
           </div>
 
           {/* INQUIRY FORM */}
-          <div className="contact-in card p-6 sm:p-8 md:p-10 lg:col-span-7">
-            {submitted ? (
+          <div id="inquiry-form" className="contact-in card scroll-mt-28 p-6 sm:p-8 md:p-10 lg:col-span-7">
+            {requested && status !== "sent" && (
+              <p className="t-small mb-6 rounded-2xl bg-accent-soft px-4 py-3 text-accent">
+                You’re requesting: <strong>{requested}</strong>. Tell us what you need below and we’ll
+                reply with a proposal.
+              </p>
+            )}
+            {status === "sent" ? (
               <div className="py-12 text-center" role="status" aria-live="polite">
                 <AnimatedCheck className="mx-auto text-[#30d158]" />
                 <h2 className="t-title mt-6">
@@ -137,7 +183,7 @@ const ContactPage = () => {
                   variant="secondary"
                   className="mt-8"
                   onClick={() => {
-                    setSubmitted(false);
+                    setStatus("idle");
                     setForm(emptyForm);
                   }}
                 >
@@ -151,6 +197,15 @@ const ContactPage = () => {
                   <p className="t-small mt-2 text-muted">
                     Tell us about your team size, workflow requirements or SLAs.
                   </p>
+                </div>
+
+                {/* honeypot: invisible to people, tempting to spam bots */}
+                <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                  <label>
+                    Leave this field empty
+                    <input type="text" name="website" tabIndex={-1} autoComplete="off"
+                      value={form.website} onChange={handleChange} />
+                  </label>
                 </div>
 
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -179,12 +234,11 @@ const ContactPage = () => {
                 <div>
                   <label htmlFor="c-service" className="label">Primary service interest</label>
                   <select id="c-service" className="field" name="service" value={form.service} onChange={handleChange}>
-                    <option value="Customer Support Outsourcing">Customer Support Outsourcing (24/7 Voice &amp; Chat)</option>
-                    <option value="Flight Booking Chat Support">Flight Booking &amp; GDS Chat Support</option>
-                    <option value="Back-Office Data Operations">Back-Office Operations &amp; Data Verification</option>
-                    <option value="Medical Billing">Medical Billing &amp; Healthcare Admin</option>
-                    <option value="Staffing & Recruitment RPO">Dedicated Staffing &amp; Offshore Teams</option>
-                    <option value="eBook & OCR Digitization">Digital eBook Conversions (W3C EPUB)</option>
+                    {serviceOptions.map((o) => (
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -195,9 +249,23 @@ const ContactPage = () => {
                     placeholder="Describe your team structure, expected volumes, target launch date and key expectations." />
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full">
-                  Submit inquiry <FiArrowRight aria-hidden="true" />
+                {status === "error" && (
+                  <p role="alert" className="t-small text-[#ff453a]">
+                    {error} You can also email us at{" "}
+                    <a href={`mailto:${company.email}`} className="underline">
+                      {company.email}
+                    </a>
+                    .
+                  </p>
+                )}
+
+                <button type="submit" disabled={status === "sending"} className="btn btn-primary w-full disabled:cursor-wait disabled:opacity-70">
+                  {status === "sending" ? "Sending…" : <>Submit inquiry <FiArrowRight aria-hidden="true" /></>}
                 </button>
+                <p className="t-caption text-center text-muted">
+                  By sending this form you agree to our{" "}
+                  <a href="/privacy" className="underline">Privacy Policy</a>.
+                </p>
               </form>
             )}
           </div>

@@ -11,27 +11,29 @@ import {
 
 import logo from "../assets/tephron-logo.jpg";
 import { gsap, SplitText, useMotion } from "../lib/motion";
+import { company, hasUk } from "../lib/company";
+import { hasGallery } from "../lib/gallery";
 
 const year = new Date().getFullYear();
-const phone = "918300378470";
-const displayPhone = "+91 83003 78470";
-const email = "tephronglobal@gmail.com";
-const address =
-  "1st West Street, Mangammal Salai, Pothigai Nagar, Tenkasi - 627811, Tamil Nadu, India";
+const phone = company.phone.whatsapp;
+const displayPhone = company.phone.display;
+const email = company.email;
+const address = company.india.address;
 
+// Only links that have a real URL in src/lib/company.js are shown.
 const socialLinks = [
-  { name: "LinkedIn", icon: FaLinkedinIn, url: "https://www.linkedin.com/company/tephron-global/" },
-  { name: "Instagram", icon: FaInstagram, url: "https://www.instagram.com/tephron_global/" },
-  { name: "Facebook", icon: FaFacebookF, url: "https://www.facebook.com/" },
-  { name: "X", icon: FaXTwitter, url: "https://x.com/" },
-];
+  { name: "LinkedIn", icon: FaLinkedinIn, url: company.social.linkedin },
+  { name: "Instagram", icon: FaInstagram, url: company.social.instagram },
+  { name: "Facebook", icon: FaFacebookF, url: company.social.facebook },
+  { name: "X", icon: FaXTwitter, url: company.social.x },
+].filter((s) => s.url);
 
 const quickLinks = [
   { name: "Home", path: "/" },
   { name: "About us", path: "/about" },
   { name: "Services", path: "/services" },
   { name: "Careers", path: "/careers" },
-  { name: "Gallery", path: "/gallery" },
+  ...(hasGallery ? [{ name: "Gallery", path: "/gallery" }] : []),
   { name: "Blog", path: "/blog" },
   { name: "Contact", path: "/contact" },
 ];
@@ -70,7 +72,7 @@ const Footer = () => {
 
   const colHead = "text-[0.8125rem] font-semibold text-fg";
   const link =
-    "t-small text-muted transition-colors duration-200 hover:text-fg";
+    "t-small inline-block py-0.5 text-muted transition-colors duration-200 hover:text-fg";
 
   return (
     <footer ref={root} className="relative overflow-hidden bg-bg-alt">
@@ -79,7 +81,7 @@ const Footer = () => {
           {/* BRAND */}
           <div className="foot-brand">
             <Link to="/" className="inline-flex items-center gap-2.5">
-              <img src={logo} alt="" width="36" height="36" className="h-9 w-9 rounded-[10px]" />
+              <img src={logo} alt="Tephron Global logo" width="36" height="36" className="h-9 w-9 rounded-[10px]" />
               <span className="text-[1.125rem] font-semibold tracking-[-0.02em]">
                 Tephron <span className="font-medium text-muted">Global</span>
               </span>
@@ -89,6 +91,7 @@ const Footer = () => {
               high-scale voice and non-voice operations, delivered with
               rigorous compliance and human empathy.
             </p>
+            {socialLinks.length > 0 && (
             <div className="mt-6 flex items-center gap-2">
               {socialLinks.map((s) => {
                 const Icon = s.icon;
@@ -106,6 +109,7 @@ const Footer = () => {
                 );
               })}
             </div>
+            )}
           </div>
 
           {/* NAVIGATE */}
@@ -149,6 +153,21 @@ const Footer = () => {
                 </a>
               </li>
               <li className="foot-link t-small max-w-[30ch] text-muted">{address}</li>
+              {hasUk && (
+                <li className="foot-link t-small max-w-[30ch] space-y-1 text-muted">
+                  <span className="block font-medium text-fg">United Kingdom</span>
+                  {company.uk.address && <span className="block">{company.uk.address}</span>}
+                  {company.uk.phone && (
+                    <a href={`tel:${company.uk.phone.replace(/[^\d+]/g, "")}`} className="block hover:text-fg">
+                      {company.uk.phone}
+                    </a>
+                  )}
+                  {company.uk.hours && <span className="block">{company.uk.hours}</span>}
+                  {company.uk.companyNumber && (
+                    <span className="block">Company no. {company.uk.companyNumber}</span>
+                  )}
+                </li>
+              )}
             </ul>
             <a
               href={`https://wa.me/${phone}?text=${encodeURIComponent(
@@ -171,10 +190,10 @@ const Footer = () => {
             © {year} Tephron Global. All rights reserved.
           </p>
           <div className="t-caption flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-muted">
-            <Link to="/about" className="hover:text-fg">
+            <Link to="/privacy" className="hover:text-fg">
               Privacy policy
             </Link>
-            <Link to="/about" className="hover:text-fg">
+            <Link to="/terms" className="hover:text-fg">
               Terms of service
             </Link>
             <Link to="/careers" className="hover:text-fg">

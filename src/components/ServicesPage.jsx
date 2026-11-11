@@ -10,12 +10,12 @@ const steps = [
     text: "We recruit top-tier graduates and seasoned voice and data specialists, then align them with client-specific SOPs and security compliance.",
   },
   {
-    title: "Secure pipeline setup",
-    text: "Teams are equipped with enterprise VPNs, encrypted workstations, multi-factor authentication and live screen monitoring software.",
+    title: "Secure workstation setup",
+    text: "Every team member works on encrypted computers with secure VPN connections and multi-factor sign-in, and we monitor work activity for security.",
   },
   {
-    title: "Weekly SLA optimisation",
-    text: "Operations Directors hold weekly KPI reviews with your leadership, reporting resolution rates, CSAT metrics and error rates.",
+    title: "Weekly performance reviews",
+    text: "A senior operations manager reviews results with your team every week: issues resolved, customer satisfaction scores and error rates.",
   },
 ];
 

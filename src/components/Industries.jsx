@@ -13,27 +13,27 @@ const industries = [
   {
     icon: FiShoppingBag,
     title: "E-commerce and retail",
-    text: "Shopify SKU creation, Amazon listing syncs, variant uploads and catalog data updates.",
+    text: "Adding and updating products on your online store and marketplaces, including descriptions, prices and variations.",
   },
   {
     icon: FiNavigation,
-    title: "Logistics and airlines",
-    text: "Amadeus and Sabre flight ticketing campaigns, scheduling logs and itinerary updates.",
+    title: "Travel and airlines",
+    text: "Customer support for airline and travel bookings, including ticket changes, schedules and itinerary updates.",
   },
   {
     icon: FiBookOpen,
     title: "Publishing and media",
-    text: "W3C EPUB eBook conversions, handwritten archive extraction and OCR digitisation.",
+    text: "Turning manuscripts and printed or handwritten archives into digital books and searchable text.",
   },
   {
     icon: FiHeart,
     title: "Healthcare admin",
-    text: "Patient directory mapping and healthcare log entry support.",
+    text: "Keeping provider directories and administrative records accurate and up to date.",
   },
   {
     icon: FiPieChart,
-    title: "Financial ledgering",
-    text: "Billing support, receipt mapping and ledger sorting campaigns.",
+    title: "Finance and bookkeeping",
+    text: "Billing support, matching receipts to expenses and keeping financial records organised.",
   },
 ];
 
@@ -107,7 +107,7 @@ const Industries = () => {
         <SectionHead
           center
           title="Tailored for global industries."
-          lead="We configure IT and Non-IT pipelines around the compliance, systems and speed your sector requires."
+          lead="We set up our teams around the rules, tools and turnaround times your industry needs."
         />
       </div>
 

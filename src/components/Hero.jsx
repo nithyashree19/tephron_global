@@ -1,12 +1,16 @@
 import { useRef } from "react";
 import { Btn } from "./ui";
 import heroWebp from "../assets/tephron-hero.webp";
+import heroWebpSmall from "../assets/tephron-hero-960.webp";
 import heroPng from "../assets/tephron-hero.png";
 import { gsap, useMotion, smooth, whenIntroDone } from "../lib/motion";
 
 // =====================================================================
 // HERO
-// Image first, copy on the image.
+// The image is landscape (16:9) at every screen size and is never cropped
+// into a tall box.
+//   lg and up : copy sits on the dark left side of the image
+//   below lg  : copy sits above the image, so nothing covers the picture
 // Sequence: orbs bloom -> frame rises out of its mask -> headline lines
 // rise -> lead + buttons fade in.
 // Continuous motion:
@@ -27,7 +31,7 @@ const Hero = () => {
     const intro = gsap.timeline({ paused: true, defaults: { ease: smooth } });
     intro
       .from(".hero-orb", { opacity: 0, scale: 0.55, duration: 2.4, stagger: 0.18, ease: "power2.out" }, 0)
-      .from(".hero-frame", { clipPath: "inset(100% 0% 0% 0% round 56px)", y: 70, duration: 1.9, ease: "expo.out", clearProps: "clipPath" }, 0.1)
+      .from(".hero-frame", { clipPath: "inset(100% 0% 0% 0% round 28px)", y: 70, duration: 1.9, ease: "expo.out", clearProps: "clipPath" }, 0.1)
       .from(".hero-img", { scale: 1.12, duration: 2.6, ease: "power2.out" }, 0.1)
       .from(".hero-line", { yPercent: 118, duration: 1.3, stagger: 0.12 }, 0.9)
       .from(".hero-sub", { opacity: 0, y: 20, duration: 1.1 }, 1.25)
@@ -45,17 +49,17 @@ const Hero = () => {
     });
     // frame corners tighten as it leaves
     gsap.to(".hero-frame-scale", {
-      borderRadius: 24,
+      borderRadius: 22,
       scale: 0.97,
       ease: "none",
       scrollTrigger: { trigger: root.current, start: "40% top", end: "bottom top", scrub: 0.5 },
     });
-    // image drifts inside the frame (parallax); 5% stays inside the 6% bleed
+    // image drifts inside the frame (parallax); 3.5% stays inside the 4% bleed
     gsap.fromTo(
       ".hero-img-wrap",
       { yPercent: 0 },
       {
-        yPercent: 5,
+        yPercent: 3.5,
         ease: "none",
         scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
       }
@@ -114,7 +118,7 @@ const Hero = () => {
   return (
     <section
       ref={root}
-      className="relative overflow-x-clip pb-8 pt-[calc(var(--header-h)+1rem)] md:pb-16 md:pt-[calc(var(--header-h)+1.5rem)]"
+      className="relative overflow-x-clip pb-10 pt-[calc(var(--header-h)+1.5rem)] md:pb-16 md:pt-[calc(var(--header-h)+2rem)]"
     >
       {/* AMBIENCE */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -131,67 +135,83 @@ const Hero = () => {
       </div>
 
       <div className="wrap relative">
-        <div className="hero-stage relative mx-auto max-w-[1280px]" style={{ perspective: "1600px" }}>
+        <div
+          className="hero-stage relative mx-auto flex max-w-[1280px] flex-col"
+          style={{ perspective: "1600px" }}
+        >
+          {/* COPY
+              below lg : centred above the image, normal text colours
+              lg and up: laid over the dark left side of the image, white text */}
+          <div className="hero-copy relative z-10 mb-8 text-center sm:mb-10 lg:absolute lg:inset-y-0 lg:left-0 lg:mb-0 lg:flex lg:w-[62%] lg:items-center lg:p-12 lg:text-left lg:text-white xl:p-16">
+            <div className="mx-auto max-w-[640px] lg:mx-0">
+              <h1 className="t-hero text-balance">
+                <span className="mask">
+                  <span className="hero-line block">Powering Businesses.</span>
+                </span>
+                <span className="mask">
+                  <span className="hero-line grad-text block">Empowering People.</span>
+                </span>
+              </h1>
+
+              <p className="hero-sub t-lead mx-auto mt-5 max-w-[540px] text-pretty text-muted lg:mx-0 lg:mt-6 lg:text-white/80">
+                Premium, scalable IT and Non-IT, customer support,
+                recruitment and technology operations.
+              </p>
+
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-7 gap-y-3 lg:mt-8 lg:justify-start">
+                <span className="hero-cta">
+                  <Btn
+                    to="/services"
+                    arrow
+                    className="lg:!bg-white lg:!text-[#1d1d1f] lg:!shadow-none lg:hover:!bg-[#f2f2f4]"
+                  >
+                    Explore services
+                  </Btn>
+                </span>
+                <span className="hero-cta">
+                  <Btn to="/contact" variant="ghost" arrow className="lg:!text-white">
+                    Talk to our team
+                  </Btn>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* IMAGE FRAME: always landscape 16:9 */}
           <div className="hero-frame">
             <div className="hero-tilt" style={{ transformStyle: "preserve-3d" }}>
               <div
-                className="hero-frame-scale relative min-h-[520px] sm:min-h-[560px] md:min-h-0 md:aspect-[16/10] md:max-h-[560px] lg:aspect-[16/9] lg:max-h-[660px] xl:max-h-[700px] overflow-hidden rounded-[24px] sm:rounded-[32px] border border-line bg-[#06132c] shadow-[var(--shadow-hero)]"
+                className="hero-frame-scale relative aspect-[16/9] overflow-hidden rounded-[20px] border border-line bg-[#06132c] shadow-[var(--shadow-hero)] sm:rounded-[28px] lg:rounded-[32px]"
                 style={{ willChange: "transform" }}
               >
-                {/* IMAGE (landscape on desktop and tab view, taller bleed for drift) */}
-                <div className="hero-img-wrap absolute inset-x-0 -top-[6%] h-[112%]">
+                {/* The image is 8% larger than the frame in both directions, so it
+                    keeps its 16:9 shape and can drift (parallax) without showing
+                    an edge. */}
+                <div className="hero-img-wrap absolute -inset-x-[4%] -top-[4%] h-[108%]">
                   <picture>
-                    <source srcSet={heroWebp} type="image/webp" />
+                    <source
+                      type="image/webp"
+                      srcSet={`${heroWebpSmall} 960w, ${heroWebp} 1672w`}
+                      sizes="(min-width: 1312px) 1280px, 100vw"
+                    />
                     <img
                       src={heroPng}
-                      alt="Tephron Global headquarters at night, with a glowing globe connecting cities worldwide"
+                      alt="Illustration of a modern office building next to a glowing globe that connects cities around the world"
                       width="1672"
                       height="941"
                       fetchPriority="high"
                       decoding="async"
                       draggable="false"
-                      className="hero-img h-full w-full object-cover object-[72%_center] sm:object-[66%_center] md:object-center lg:object-center"
+                      className="hero-img h-full w-full object-cover object-center"
                     />
                   </picture>
                 </div>
 
-                {/* legibility: dark on the text side, fades out toward the building */}
+                {/* legibility: only needed where the copy sits on the image */}
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(4,12,30,0.95)_0%,rgba(4,12,30,0.65)_48%,rgba(4,12,30,0.18)_100%)] md:bg-[linear-gradient(to_right,rgba(4,12,30,0.92)_0%,rgba(4,12,30,0.78)_40%,rgba(4,12,30,0.25)_68%,rgba(4,12,30,0.05)_100%)]"
+                  className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,rgba(4,12,30,0.86)_0%,rgba(4,12,30,0.55)_30%,rgba(4,12,30,0)_58%)] lg:block"
                 />
-
-                {/* COPY ON THE IMAGE */}
-                <div className="hero-copy relative z-10 flex h-full min-h-[520px] sm:min-h-[560px] md:min-h-0 items-end p-6 sm:p-10 md:items-center md:p-10 lg:p-14 xl:p-16">
-                  <div className="max-w-[540px] lg:max-w-[620px] text-left text-white">
-                    <h1 className="t-hero text-balance">
-                      <span className="mask">
-                        <span className="hero-line block">Powering Businesses.</span>
-                      </span>
-                      <span className="mask">
-                        <span className="hero-line grad-text block">Empowering People.</span>
-                      </span>
-                    </h1>
-
-                    <p className="hero-sub t-lead mt-4 md:mt-5 max-w-[480px] lg:max-w-[540px] text-pretty text-white/80">
-                      Premium, scalable IT and Non-IT, customer support,
-                      recruitment and technology operations.
-                    </p>
-
-                    <div className="mt-6 md:mt-8 flex flex-wrap items-center gap-x-5 md:gap-x-7 gap-y-3">
-                      <span className="hero-cta">
-                        <Btn to="/services" variant="light" arrow>
-                          Explore services
-                        </Btn>
-                      </span>
-                      <span className="hero-cta">
-                        <Btn to="/contact" variant="ghost" arrow className="!text-white">
-                          Talk to our team
-                        </Btn>
-                      </span>
-                    </div>
-                  </div>
-                </div>
 
                 {/* thin inner highlight: glass-edge feel */}
                 <div

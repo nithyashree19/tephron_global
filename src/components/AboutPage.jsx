@@ -9,11 +9,12 @@ import {
   FiTrendingUp,
   FiCheck,
 } from "react-icons/fi";
-import { FaWhatsapp } from "react-icons/fa6";
+import { FaWhatsapp, FaLinkedinIn } from "react-icons/fa6";
 
 import founderImg from "../assets/dinesh-founder.jpg";
 import { Btn, PageHeader, SectionHead, CtaBand } from "./ui";
 import { gsap, clip, wipe, useMotion, smooth, revealHeadings } from "../lib/motion";
+import { company, stats } from "../lib/company";
 
 const values = [
   {
@@ -52,15 +53,16 @@ const milestones = [
 ];
 
 const trust = [
-  "ISO compliant protocols",
   "24/7/365 global coverage",
-  "Dedicated agile pods",
+  "A dedicated team for each client",
+  "Secure, encrypted workstations",
 ];
 
+// same figures as the home page (src/lib/company.js)
 const founderStats = [
-  { icon: FiAward, n: 2, suffix: "+ years", label: "Experience" },
-  { icon: FiUsers, n: 50, suffix: "+", label: "Clients" },
-  { icon: FiTrendingUp, n: 50, suffix: "+", label: "Active agents" },
+  { icon: FiUsers, ...stats[0] },
+  { icon: FiTrendingUp, ...stats[1] },
+  { icon: FiAward, ...stats[2] },
 ];
 
 const AboutPage = () => {
@@ -124,25 +126,32 @@ const AboutPage = () => {
     });
 
     // founder stats count up
-    gsap.utils.toArray(".fs-num", root.current).forEach((el) => {
+    // The real number is in the HTML. Only when the count actually starts
+    // (just as it scrolls into view) does it restart from 0.
+    const nums = gsap.utils.toArray(".fs-num", root.current);
+    nums.forEach((el) => {
       const end = Number(el.dataset.end);
       const obj = { v: 0 };
-      el.firstChild.nodeValue = "0";
       gsap.to(obj, {
         v: end,
         duration: 2,
         ease: "power3.out",
         snap: { v: 1 },
-        scrollTrigger: { trigger: el, start: "top 92%", once: true },
+        paused: true,
+        scrollTrigger: {
+          trigger: el,
+          start: "top 92%",
+          once: true,
+          onEnter: (self) => {
+            el.firstChild.nodeValue = "0";
+            self.animation.play();
+          },
+        },
         onUpdate: () => (el.firstChild.nodeValue = String(obj.v)),
       });
     });
 
-    return () => {
-      gsap.utils
-        .toArray(".fs-num", root.current)
-        .forEach((el) => (el.firstChild.nodeValue = el.dataset.end));
-    };
+    return () => nums.forEach((el) => (el.firstChild.nodeValue = el.dataset.end));
   }, root);
 
   return (
@@ -257,7 +266,18 @@ const AboutPage = () => {
             </div>
             <figcaption className="mt-5">
               <p className="t-h3 text-[1.375rem]">Dinesh G</p>
-              <p className="t-small text-muted">Founder and Chief Executive</p>
+              <p className="t-small text-muted">{company.founder.title}</p>
+              {company.founder.linkedin && (
+                <a
+                  href={company.founder.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${company.founder.name} on LinkedIn`}
+                  className="t-small mt-3 inline-flex items-center gap-2 font-medium text-accent"
+                >
+                  <FaLinkedinIn aria-hidden="true" /> LinkedIn
+                </a>
+              )}
             </figcaption>
           </figure>
 
@@ -276,12 +296,11 @@ const AboutPage = () => {
 
             <blockquote className="founder-in mt-8 border-l-[3px] border-accent pl-6">
               <p className="t-lead text-pretty">
-                “Business process outsourcing is not just about moving task
-                arrays; it is about building deep, repeatable operational
-                trust. By blending advanced technological pipelines with
-                top-tier training, we deliver operations that consistently
-                expand our clients’ bottom lines while empowering our teams’
-                local careers.”
+                “Business process outsourcing is not just about handing off
+                tasks; it is about building deep, repeatable trust. By pairing
+                modern technology with thorough training, we deliver work that
+                consistently improves our clients’ results while creating
+                careers for our teams close to home.”
               </p>
             </blockquote>
 

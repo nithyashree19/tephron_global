@@ -35,49 +35,55 @@ import {
 
 const services = [
   {
-    title: "Data operations and processing",
+    title: "Data entry and processing",
+    request: "Data entry and back-office operations",
     description:
-      "High-accuracy database entry, bulk indexing, web data cleansing and catalog updates.",
+      "Accurate data entry, large-scale record updates, and cleaning up messy data and product catalogues.",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=75",
     icon: FiDatabase,
     tint: "from-[#0a3a8a] to-[#0a1d4a]",
   },
   {
-    title: "Omnichannel customer support",
+    title: "Customer support by phone, chat and email",
+    request: "Customer support (phone, chat and email)",
     description:
-      "24/7/365 international voice, chat and email routing, plus airline and GDS ticket campaign support.",
+      "Round-the-clock support for your customers in any time zone, including airline and travel booking support.",
     image: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=900&q=75",
     icon: FiUsers,
     tint: "from-[#07607a] to-[#06283a]",
   },
   {
-    title: "Virtual assistance and sales ops",
+    title: "Virtual assistants and sales support",
+    request: "Virtual assistants and sales support",
     description:
-      "B2B contact list compilation, CRM database logging and product listings management.",
+      "Assistants who build prospect lists, keep your CRM up to date and manage your product listings.",
     image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=900&q=75",
     icon: FiHeadphones,
     tint: "from-[#8a3d05] to-[#3a1a05]",
   },
   {
     title: "Digital eBook conversions",
+    request: "eBook conversion and document digitisation",
     description:
-      "Standard W3C EPUB formatting, document digitisation and handwritten transcription.",
+      "Turning manuscripts, scans and handwritten pages into properly formatted eBooks.",
     image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=900&q=75",
     icon: FiBookOpen,
     tint: "from-[#1d4f9a] to-[#0b1f40]",
   },
   {
-    title: "Specialised healthcare admin",
+    title: "Healthcare administration",
+    request: "Healthcare administration and billing",
     description:
-      "Healthcare directory entries, medical catalog updates and administrative support.",
+      "Back-office help for healthcare providers, such as keeping directories and records up to date.",
     image: "https://images.unsplash.com/photo-1504813184591-01572f98c85f?auto=format&fit=crop&w=900&q=75",
     icon: FiHeart,
     tint: "from-[#0a6a6a] to-[#082f35]",
   },
   {
-    title: "Financial ledger compliance",
+    title: "Bookkeeping support",
+    request: "Bookkeeping support",
     description:
-      "Transaction matching, expense receipt mapping and ledger sorting workflows.",
+      "Matching transactions to receipts and organising expense records so your books stay tidy.",
     image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=900&q=75",
     icon: FiFileText,
     tint: "from-[#4a2a9a] to-[#1a1040]",
@@ -159,6 +165,7 @@ const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
       trigger: view,
       inertia: true,
       edgeResistance: 0.75,
+      minimumMovement: 6,
       bounds: { minX, maxX: 0 },
       // InertiaPlugin projects the resting point; we pick the nearest card edge
       snap: { x: (v) => nearest(v) },
@@ -321,7 +328,8 @@ const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
                   <h3 className="t-h3">{s.title}</h3>
                   <p className="t-small mt-3 max-w-[34ch] text-white/80">{s.description}</p>
                   <Link
-                    to="/contact"
+                    to={`/contact?service=${encodeURIComponent(s.request)}`}
+                    aria-label={`Request this service: ${s.title}`}
                     className="t-small mt-5 inline-flex items-center gap-1.5 font-medium text-white transition-[gap] duration-300 hover:gap-2.5"
                   >
                     Request this service <FiArrowRight aria-hidden="true" />

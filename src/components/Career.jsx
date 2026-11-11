@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 
 import { Btn, PageHeader, SectionHead, AnimatedCheck } from "./ui";
+import { sendForm, fileToBase64 } from "../lib/submit";
 import {
   gsap,
   clip,
@@ -69,7 +70,10 @@ const initialForm = {
   skills: "",
   description: "",
   resume: null,
+  website: "", // honeypot: hidden from people, bots fill it in
 };
+
+const MAX_RESUME_MB = 3;
 
 // =====================================================================
 // APPLICATION SHEET
@@ -89,6 +93,8 @@ const ApplySheet = ({ job, onClose }) => {
   const [form, setForm] = useState(initialForm);
   const [submitted, setSubmitted] = useState(false);
   const [resumeError, setResumeError] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
 
   const isPhone = () => window.matchMedia("(max-width: 639px)").matches;
 
@@ -199,8 +205,8 @@ const ApplySheet = ({ job, onClose }) => {
       e.target.value = "";
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setResumeError("Your resume is over 5 MB. Upload a smaller file.");
+    if (file.size > MAX_RESUME_MB * 1024 * 1024) {
+      setResumeError(`Your resume is over ${MAX_RESUME_MB} MB. Upload a smaller file.`);
       e.target.value = "";
       return;
     }
@@ -208,10 +214,27 @@ const ApplySheet = ({ job, onClose }) => {
     setForm((f) => ({ ...f, resume: file }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Job Application:", { ...form, jobTitle: job.title });
-    setSubmitted(true);
+    if (sending) return;
+    setSending(true);
+    setSendError("");
+    try {
+      const { resume, ...fields } = form;
+      await sendForm({
+        type: "application",
+        jobTitle: job.title,
+        ...fields,
+        resume: resume
+          ? { name: resume.name, type: resume.type, data: await fileToBase64(resume) }
+          : null,
+      });
+      setSubmitted(true);
+    } catch (err) {
+      setSendError(err.message);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -256,12 +279,21 @@ const ApplySheet = ({ job, onClose }) => {
               <AnimatedCheck className="mx-auto text-[#30d158]" />
               <h3 className="t-title mt-6">Thank you.</h3>
               <p className="t-body mt-3 text-muted">
-                Your demo application has been captured successfully.
+                Your application has been sent. Our team will review it and be in touch if there is a fit.
               </p>
               <Btn className="mt-8" onClick={close}>Close</Btn>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* honeypot: invisible to people, tempting to spam bots */}
+              <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+                <label>
+                  Leave this field empty
+                  <input type="text" name="website" tabIndex={-1} autoComplete="off"
+                    value={form.website} onChange={handleChange} />
+                </label>
+              </div>
+
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <label htmlFor="a-name" className="label">Full name</label>
@@ -306,7 +338,7 @@ const ApplySheet = ({ job, onClose }) => {
                   <span className="t-small font-medium">
                     {form.resume ? form.resume.name : "Choose your resume"}
                   </span>
-                  <span className="t-caption mt-1 text-muted">PDF, DOC or DOCX, up to 5 MB</span>
+                  <span className="t-caption mt-1 text-muted">PDF, DOC or DOCX, up to 3 MB</span>
                   <input
                     type="file"
                     accept=".pdf,.doc,.docx"
@@ -321,11 +353,15 @@ const ApplySheet = ({ job, onClose }) => {
               </div>
 
               <div className="pt-1">
-                <button type="submit" className="btn btn-primary w-full">
-                  Submit application <FiArrowRight aria-hidden="true" />
+                {sendError && (
+                  <p role="alert" className="t-small mb-3 text-[#ff453a]">{sendError}</p>
+                )}
+                <button type="submit" disabled={sending} className="btn btn-primary w-full disabled:cursor-wait disabled:opacity-70">
+                  {sending ? "Sending…" : <>Submit application <FiArrowRight aria-hidden="true" /></>}
                 </button>
                 <p className="t-caption mt-3 text-center text-muted">
-                  Your information will be used for recruitment purposes only.
+                  Your information is used for recruitment only. See our{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>.
                 </p>
               </div>
             </form>

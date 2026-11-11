@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 
 import logo from "../assets/tephron-logo.jpg";
 import ThemeToggle from "./ThemeToggle";
+import { hasGallery } from "../lib/gallery";
 import { Btn } from "./ui";
 import {
   gsap,
@@ -18,7 +19,8 @@ const links = [
   { name: "About", path: "/about" },
   { name: "Services", path: "/services" },
   { name: "Careers", path: "/careers" },
-  { name: "Gallery", path: "/gallery" },
+  // Gallery only appears once real photos are in src/assets/gallery
+  ...(hasGallery ? [{ name: "Gallery", path: "/gallery" }] : []),
   { name: "Blog", path: "/blog" },
   { name: "Contact", path: "/contact" },
 ];
@@ -182,7 +184,7 @@ const Navbar = () => {
           >
             <img
               src={logo}
-              alt=""
+              alt="Tephron Global logo"
               width="32"
               height="32"
               className="h-8 w-8 rounded-[9px] object-cover shadow-[0_1px_6px_rgba(0,0,0,0.25)]"

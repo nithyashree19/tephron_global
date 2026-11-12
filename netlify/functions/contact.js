@@ -101,6 +101,8 @@ exports.handler = async (event) => {
       attachments = [{ filename: `Resume_${safe}${ext}`, content: buf, contentType: r.type }];
     }
   } else {
+    const companyName = line(data.company, 160);
+    if (!companyName) return reply(400, { ok: false, error: "Please enter your company name." });
     const message = block(data.message, 5000);
     if (!message) return reply(400, { ok: false, error: "Please tell us about your project." });
 
@@ -109,7 +111,7 @@ exports.handler = async (event) => {
       ["Name", name],
       ["Email", email],
       ["Phone", line(data.phone, 40)],
-      ["Company", line(data.company, 160)],
+      ["Company", companyName],
       ["Service", service],
       ["Message", message],
     ];

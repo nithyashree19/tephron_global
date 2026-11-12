@@ -120,7 +120,9 @@ const ContactPage = () => {
       if (!/^\+?[0-9\s()-]+$/.test(phone) || digits.length < 7 || digits.length > 15)
         errs.phone = "Enter a valid phone number (7 to 15 digits, optional + at the start).";
     }
-    if (f.company.trim().length > 160) errs.company = "Company name is too long.";
+    const companyName = f.company.trim();
+    if (!companyName) errs.company = "Please enter your company name.";
+    else if (companyName.length > 160) errs.company = "Company name is too long.";
     if (!message) errs.message = "Please describe your project.";
     else if (message.length < 20) errs.message = "Please give a little more detail (at least 20 characters).";
     else if (message.length > 5000) errs.message = "Please keep your message under 5,000 characters.";
@@ -275,7 +277,7 @@ const ContactPage = () => {
                   <div>
                     <label htmlFor="c-company" className="label">Company name</label>
                     <input id="c-company" className="field" type="text" name="company" autoComplete="organization"
-                      value={form.company} onChange={handleChange} placeholder="Acme Global Inc"
+                      value={form.company} onChange={handleChange} placeholder="Acme Global Inc" aria-required="true"
                       aria-invalid={!!fieldErrors.company} aria-describedby={fieldErrors.company ? "c-company-err" : undefined} />
                     <FieldError id="c-company-err" msg={fieldErrors.company} />
                   </div>
@@ -298,6 +300,7 @@ const ContactPage = () => {
                     value={form.message} onChange={handleChange}
                     aria-invalid={!!fieldErrors.message} aria-describedby={fieldErrors.message ? "c-message-err" : undefined}
                     placeholder="Describe your team structure, expected volumes, target launch date and key expectations." />
+                  <FieldError id="c-message-err" msg={fieldErrors.message} />
                 </div>
 
                 {status === "error" && (

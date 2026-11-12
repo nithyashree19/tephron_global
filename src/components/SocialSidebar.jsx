@@ -6,9 +6,9 @@ const WA =
   "https://wa.me/918300378470?text=Hello%20Tephron%20Global%2C%20I%20would%20like%20to%20connect%20with%20your%20team.";
 
 const socials = [
-  { name: "LinkedIn", icon: FaLinkedinIn, url: "https://www.linkedin.com/company/tephron-global/",size:23 },
-  { name: "Instagram", icon: FaInstagram, url: "https://www.instagram.com/tephron_global/",size:40 },
-  { name: "WhatsApp", icon: FaWhatsapp, url: WA , size:45},
+  { name: "LinkedIn", icon: FaLinkedinIn, url: "https://www.linkedin.com/company/tephron-global/" },
+  { name: "Instagram", icon: FaInstagram, url: "https://www.instagram.com/tephron_global/" },
+  { name: "WhatsApp", icon: FaWhatsapp, url: WA },
 ];
 
 // Wide screens: a slim glass dock on the left edge.
@@ -46,7 +46,7 @@ const SocialSidebar = () => {
               aria-label={`Connect on ${s.name}`}
               className="dock-btn group relative flex h-11 w-11 items-center justify-center rounded-full text-muted transition-[background-color,color,transform] duration-200 hover:bg-accent-soft hover:text-accent active:scale-90"
             >
-              <Icon size={s.size} />
+              <Icon size={37} />
               <span className="t-caption pointer-events-none absolute left-full ml-3 translate-x-[-4px] whitespace-nowrap rounded-lg bg-fg px-2.5 py-1 font-medium text-bg opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-x-0 group-hover:opacity-100">
                 {s.name}
               </span>

@@ -6,7 +6,7 @@ const WA =
   "https://wa.me/918300378470?text=Hello%20Tephron%20Global%2C%20I%20would%20like%20to%20connect%20with%20your%20team.";
 
 const socials = [
-  { name: "LinkedIn", icon: FaLinkedinIn, url: "https://www.linkedin.com/company/tephron-global/",size:20 },
+  { name: "LinkedIn", icon: FaLinkedinIn, url: "https://www.linkedin.com/company/tephron-global/",size:23 },
   { name: "Instagram", icon: FaInstagram, url: "https://www.instagram.com/tephron_global/",size:40 },
   { name: "WhatsApp", icon: FaWhatsapp, url: WA , size:45},
 ];

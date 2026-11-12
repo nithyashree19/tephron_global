@@ -173,7 +173,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="btn btn-sm mt-6 bg-[#25D366] text-white hover:bg-[#1fb957]"
             >
-              <FaWhatsapp size={16} aria-hidden="true" />
+              <FaWhatsapp size={20} aria-hidden="true" />
               Chat on WhatsApp
               <FiArrowUpRight aria-hidden="true" />
             </a>

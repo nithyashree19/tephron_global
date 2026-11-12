@@ -275,7 +275,7 @@ const Navbar = () => {
               key={l.path}
               to={l.path}
               className={({ isActive }) =>
-                `m-link border-b border-line py-3 text-[clamp(1.5rem,6vw,2.25rem)] font-semibold leading-tight tracking-[-0.03em] transition-colors active:text-accent ${
+                `m-link border-b border-line py-3 text-[1.25rem] sm:text-[clamp(1.5rem,6vw,2.25rem)] font-semibold leading-tight tracking-[-0.03em] transition-colors active:text-accent ${
                   isActive ? "text-accent" : "text-fg"
                 }`
               }

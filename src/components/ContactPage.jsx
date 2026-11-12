@@ -19,6 +19,13 @@ const emptyForm = {
   website: "", // honeypot: hidden from people, bots fill it in
 };
 
+const FieldError = ({ id, msg }) =>
+  msg ? (
+    <p id={id} role="alert" className="t-caption mt-1.5 text-[#ff453a]">
+      {msg}
+    </p>
+  ) : null;
+
 const details = [
   { icon: FiMapPin, label: company.india.label, value: company.india.address },
   {
@@ -61,6 +68,7 @@ const ContactPage = () => {
   const [form, setForm] = useState({ ...emptyForm, service: requested || emptyForm.service });
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useMotion(() => {
     const cards = gsap.utils.toArray(".contact-in", root.current);
@@ -89,12 +97,46 @@ const ContactPage = () => {
     return () => clearTimeout(t);
   }, [requested]);
 
-  const handleChange = (e) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    if (fieldErrors[name]) setFieldErrors((errs) => ({ ...errs, [name]: "" }));
+  };
+
+  // Checks every field before anything is sent. Returns { field: message }.
+  const validate = (f) => {
+    const errs = {};
+    const name = f.name.trim();
+    const email = f.email.trim();
+    const phone = f.phone.trim();
+    const message = f.message.trim();
+    if (!name) errs.name = "Please enter your full name.";
+    else if (name.length < 2) errs.name = "Name must be at least 2 characters.";
+    else if (!/^[\p{L}][\p{L}\s.'-]*$/u.test(name)) errs.name = "Name can only contain letters, spaces, dots, apostrophes and hyphens.";
+    if (!email) errs.email = "Please enter your business email.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) errs.email = "Please enter a valid email, such as name@company.com.";
+    if (phone) {
+      const digits = phone.replace(/\D/g, "");
+      if (!/^\+?[0-9\s()-]+$/.test(phone) || digits.length < 7 || digits.length > 15)
+        errs.phone = "Enter a valid phone number (7 to 15 digits, optional + at the start).";
+    }
+    if (f.company.trim().length > 160) errs.company = "Company name is too long.";
+    if (!message) errs.message = "Please describe your project.";
+    else if (message.length < 20) errs.message = "Please give a little more detail (at least 20 characters).";
+    else if (message.length > 5000) errs.message = "Please keep your message under 5,000 characters.";
+    return errs;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (status === "sending") return;
+    const errs = validate(form);
+    setFieldErrors(errs);
+    if (Object.keys(errs).length > 0) {
+      const first = Object.keys(errs)[0];
+      document.getElementById(`c-${first}`)?.focus();
+      return;
+    }
     setStatus("sending");
     setError("");
     try {
@@ -191,7 +233,7 @@ const ContactPage = () => {
                 </Btn>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="contact-form space-y-5">
+              <form onSubmit={handleSubmit} noValidate className="contact-form space-y-5">
                 <div>
                   <h2 className="t-h3">Send us a message</h2>
                   <p className="t-small mt-2 text-muted">
@@ -211,23 +253,31 @@ const ContactPage = () => {
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div>
                     <label htmlFor="c-name" className="label">Full name</label>
-                    <input id="c-name" className="field" type="text" name="name" required autoComplete="name"
-                      value={form.name} onChange={handleChange} placeholder="John Doe" />
+                    <input id="c-name" className="field" type="text" name="name" autoComplete="name"
+                      value={form.name} onChange={handleChange} placeholder="John Doe"
+                      aria-invalid={!!fieldErrors.name} aria-describedby={fieldErrors.name ? "c-name-err" : undefined} />
+                    <FieldError id="c-name-err" msg={fieldErrors.name} />
                   </div>
                   <div>
                     <label htmlFor="c-email" className="label">Business email</label>
-                    <input id="c-email" className="field" type="email" name="email" required autoComplete="email"
-                      value={form.email} onChange={handleChange} placeholder="john@company.com" />
+                    <input id="c-email" className="field" type="email" name="email" autoComplete="email"
+                      value={form.email} onChange={handleChange} placeholder="john@company.com"
+                      aria-invalid={!!fieldErrors.email} aria-describedby={fieldErrors.email ? "c-email-err" : undefined} />
+                    <FieldError id="c-email-err" msg={fieldErrors.email} />
                   </div>
                   <div>
                     <label htmlFor="c-phone" className="label">Phone number</label>
                     <input id="c-phone" className="field" type="tel" name="phone" autoComplete="tel"
-                      value={form.phone} onChange={handleChange} placeholder="+1 555-0199" />
+                      value={form.phone} onChange={handleChange} placeholder="+1 555-0199"
+                      aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? "c-phone-err" : undefined} />
+                    <FieldError id="c-phone-err" msg={fieldErrors.phone} />
                   </div>
                   <div>
                     <label htmlFor="c-company" className="label">Company name</label>
                     <input id="c-company" className="field" type="text" name="company" autoComplete="organization"
-                      value={form.company} onChange={handleChange} placeholder="Acme Global Inc" />
+                      value={form.company} onChange={handleChange} placeholder="Acme Global Inc"
+                      aria-invalid={!!fieldErrors.company} aria-describedby={fieldErrors.company ? "c-company-err" : undefined} />
+                    <FieldError id="c-company-err" msg={fieldErrors.company} />
                   </div>
                 </div>
 
@@ -244,8 +294,9 @@ const ContactPage = () => {
 
                 <div>
                   <label htmlFor="c-message" className="label">Project details</label>
-                  <textarea id="c-message" className="field resize-none" name="message" rows={5} required
+                  <textarea id="c-message" className="field resize-none" name="message" rows={5}
                     value={form.message} onChange={handleChange}
+                    aria-invalid={!!fieldErrors.message} aria-describedby={fieldErrors.message ? "c-message-err" : undefined}
                     placeholder="Describe your team structure, expected volumes, target launch date and key expectations." />
                 </div>
 

@@ -3,7 +3,7 @@ import { FiArrowLeft, FiClock } from "react-icons/fi";
 import { Btn, CtaBand } from "./ui";
 import BlogCover from "./BlogCover";
 import NotFound from "./NotFound";
-import { getPost, posts } from "../lib/posts";
+import { usePosts } from "../lib/blogStore";
 
 const Block = ({ b }) => {
   if (b.t === "h2") return <h2 className="t-h3 mt-12 text-balance">{b.text}</h2>;
@@ -20,10 +20,11 @@ const Block = ({ b }) => {
 
 const BlogPostPage = () => {
   const { slug } = useParams();
-  const post = getPost(slug);
+  const published = usePosts().filter((p) => p.published);
+  const post = published.find((p) => p.slug === slug);
   if (!post) return <NotFound />;
 
-  const others = posts.filter((p) => p.slug !== post.slug);
+  const others = published.filter((p) => p.slug !== post.slug);
 
   return (
     <div>
@@ -46,6 +47,7 @@ const BlogPostPage = () => {
         <div className="wrap">
           <BlogCover
             slug={post.slug}
+            image={post.coverImage}
             className="relative mx-auto aspect-[16/8] max-w-[1000px] rounded-[24px] md:rounded-[32px]"
           />
         </div>

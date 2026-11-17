@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   FiArrowRight,
   FiMapPin,
@@ -14,6 +14,7 @@ import {
 
 import { Btn, PageHeader, SectionHead, AnimatedCheck } from "./ui";
 import { sendForm, fileToBase64 } from "../lib/submit";
+import { useJobs } from "../lib/jobsStore";
 import {
   gsap,
   clip,
@@ -25,36 +26,6 @@ import {
   prefersReducedMotion,
   revealHeadings,
 } from "../lib/motion";
-
-// =====================================
-// JOB DATA: add new vacancies here
-// =====================================
-const jobs = [
-  {
-    id: 1,
-    title: "Tamil Voice Process",
-    department: "Call Support",
-    location: "Tenkasi",
-    type: "Remote",
-    experience: "0–1 Year",
-    experienceLevel: "Fresher",
-    description:
-      "We are looking for enthusiastic candidates with excellent Tamil communication skills to support customer interactions and deliver outstanding service experiences.",
-    skills: ["Tamil Communication", "Customer Support", "Communication"],
-  },
-  {
-    id: 2,
-    title: "Senior Customer Support Executive",
-    department: "Call Support",
-    location: "Chennai",
-    type: "On-site",
-    experience: "2–4 Years",
-    experienceLevel: "Experienced",
-    description:
-      "Looking for experienced customer support professionals with strong communication, problem-solving and customer relationship skills.",
-    skills: ["Customer Support", "Communication", "Problem Solving"],
-  },
-];
 
 const perks = [
   { icon: FiTrendingUp, title: "Learn and develop", text: "Build professional knowledge and strengthen your capabilities." },
@@ -390,12 +361,59 @@ const ApplySheet = ({ job, onClose }) => {
 // =====================================================================
 // PAGE
 // =====================================================================
+// Expanded details for one opening (responsibilities, requirements, skills)
+const JobDetail = ({ job }) => {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    if (prefersReducedMotion() || !ref.current) return;
+    gsap.fromTo(ref.current, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.6, ease: smooth, clearProps: "transform" });
+  }, []);
+
+  const Block = ({ title, items }) =>
+    items?.length ? (
+      <div>
+        <h4 className="t-small font-semibold">{title}</h4>
+        <ul className="t-small mt-3 list-disc space-y-2 pl-5 text-muted">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
+
+  return (
+    <div ref={ref} className="border-b border-line bg-bg-alt/60 px-5 py-7 sm:px-7">
+      <div className="grid gap-8 md:grid-cols-2">
+        <div>
+          <h4 className="t-small font-semibold">About the role</h4>
+          <p className="t-small mt-3 leading-relaxed text-muted">{job.description}</p>
+          {job.skills?.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {job.skills.map((skill) => (
+                <span key={skill} className="rounded-full bg-accent-soft px-3 py-1 text-[0.8125rem] font-medium text-accent">
+                  {skill}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="space-y-7">
+          <Block title="Responsibilities" items={job.responsibilities} />
+          <Block title="Requirements" items={job.requirements} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Career = () => {
   const root = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [experienceFilter, setExperienceFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [selectedJob, setSelectedJob] = useState(null);
+  const [openDetail, setOpenDetail] = useState(null);
+  const jobs = useJobs().filter((j) => j.open);
 
   const categories = ["All", ...new Set(jobs.map((j) => j.department))];
 
@@ -550,8 +568,8 @@ const Career = () => {
             </div>
 
             {filteredJobs.map((job) => (
+              <Fragment key={job.id}>
               <div
-                key={job.id}
                 className="job-row grid gap-4 border-b border-line px-5 py-5 transition-colors last:border-b-0 hover:bg-bg-alt/60 sm:px-6 sm:py-6 md:grid-cols-[1.6fr_1fr_0.8fr_0.8fr_auto] md:items-center md:px-7"
               >
                 <div>
@@ -585,10 +603,22 @@ const Career = () => {
                   </p>
                 </div>
 
-                <Btn small onClick={() => setSelectedJob(job)} className="w-full sm:w-auto md:w-[112px]">
-                  Apply now
-                </Btn>
+                <div className="flex w-full gap-2 sm:w-auto md:w-[112px] md:flex-col">
+                  <Btn small onClick={() => setSelectedJob(job)} className="w-full sm:w-auto md:w-[112px]">
+                    Apply now
+                  </Btn>
+                  <Btn
+                    small
+                    variant="ghost"
+                    onClick={() => setOpenDetail(openDetail === job.id ? null : job.id)}
+                    className="w-full sm:w-auto md:w-[112px]"
+                  >
+                    {openDetail === job.id ? "Hide details" : "View details"}
+                  </Btn>
+                </div>
               </div>
+              {openDetail === job.id && <JobDetail job={job} />}
+              </Fragment>
             ))}
 
             {filteredJobs.length === 0 && (

@@ -10,10 +10,10 @@ const covers = {
 };
 
 // Position it with className (for example "absolute inset-0" or "relative aspect-[16/8]").
-const BlogCover = ({ slug, className = "" }) => {
+const BlogCover = ({ slug, image, className = "" }) => {
   const c = covers[slug] || covers.default;
   const Icon = c.icon;
-  const photo = blogPhotoFor(slug);
+  const photo = image || blogPhotoFor(slug);
   if (photo) {
     return (
       <div className={`overflow-hidden bg-bg-alt ${className}`}>

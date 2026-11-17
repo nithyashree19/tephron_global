@@ -1,0 +1,20 @@
+/* Admin uses the public site's own colour tokens (see index.css), so the
+   admin matches the website in light and dark mode. The only extra rule
+   is the primary button fill, which reads the site's accent. */
+.admin-grad {
+  background-color: var(--accent);
+}
+
+/* Glass panels that sit over the Tephron hero background */
+.glass {
+  background-color: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 24px 60px -28px rgba(0, 30, 90, 0.35);
+}
+.dark .glass {
+  background-color: rgba(10, 16, 30, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.7);
+}

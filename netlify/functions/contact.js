@@ -1,14 +1,4 @@
-// =====================================================================
-// POST /.netlify/functions/contact
-// Receives the Contact form and the Careers application form and emails
-// them to the Tephron Global inbox through Gmail SMTP.
-//
-// Secrets live ONLY in Netlify environment variables (never in the repo,
-// never in browser code):
-//   EMAIL_USER          Gmail address that sends the mail
-//   EMAIL_APP_PASSWORD  16-character Google "App password" for that account
-//   EMAIL_TO            (optional) where to deliver; defaults to EMAIL_USER
-// =====================================================================
+
 const nodemailer = require("nodemailer");
 
 const MAX_RESUME_BYTES = 3 * 1024 * 1024; // keeps the request under Netlify's 6 MB limit

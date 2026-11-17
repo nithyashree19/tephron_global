@@ -18,7 +18,8 @@ import {
 } from "react-icons/fi";
 import { Btn, CtaBand, MaskLines, SectionHead } from "./ui";
 import NotFound from "./NotFound";
-import { getService, servicesData } from "../lib/servicesData";
+import { useServices } from "../lib/servicesStore";
+import { Navigate } from "react-router-dom";
 import { photoFor } from "../lib/servicePhotos";
 import { gsap, clip, useMotion, revealPageHeader, revealHeadings } from "../lib/motion";
 
@@ -62,7 +63,8 @@ const Faq = ({ q, a }) => {
 
 const ServiceDetailPage = () => {
   const { slug } = useParams();
-  const svc = getService(slug);
+  const allServices = useServices();
+  const svc = allServices.find((x) => x.slug === slug);
   const root = useRef(null);
 
   useMotion(
@@ -113,10 +115,12 @@ const ServiceDetailPage = () => {
 
   if (!svc) return <NotFound />;
 
+  if (!svc) return <Navigate to="/services" replace />;
+
   const Icon = heroIcon[svc.slug] || FiLayers;
   const photo = photoFor(svc.slug);
   const contact = `/contact?service=${encodeURIComponent(svc.request)}`;
-  const others = servicesData.filter((s) => s.slug !== svc.slug);
+  const others = allServices.filter((s) => s.published && s.slug !== svc.slug);
   const cta = svc.cta.length
     ? svc.cta
     : ["Talk to us about this service.", "Tell us your volumes and targets and we will design the team around them.", "Start the conversation"];

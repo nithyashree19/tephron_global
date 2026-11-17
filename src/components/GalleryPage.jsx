@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { PageHeader, CtaBand, Btn } from "./ui";
 import { gsap, clip, wipe, useMotion } from "../lib/motion";
-import { galleryImages } from "../lib/gallery";
+import { useGallery } from "../lib/galleryStore";
 
 const GalleryPage = () => {
   const root = useRef(null);
   const [open, setOpen] = useState(null);
+  const galleryImages = useGallery();
 
   useEffect(() => {
     if (open === null) return;
@@ -53,7 +54,7 @@ const GalleryPage = () => {
         <div className="wrap grid auto-rows-[175px] grid-cols-2 gap-3 sm:auto-rows-[210px] md:auto-rows-[250px] lg:auto-rows-[270px] md:grid-cols-4 md:gap-4">
           {galleryImages.map((g, idx) => (
             <figure
-              key={g.image}
+              key={g.id}
               onClick={() => setOpen(idx)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(idx))}
               role="button"

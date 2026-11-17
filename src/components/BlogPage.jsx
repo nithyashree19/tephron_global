@@ -4,7 +4,7 @@ import { FiClock, FiArrowRight } from "react-icons/fi";
 import { PageHeader } from "./ui";
 import BlogCover from "./BlogCover";
 import { gsap, clip, wipe, useMotion } from "../lib/motion";
-import { posts } from "../lib/posts";
+import { usePosts } from "../lib/blogStore";
 
 const Article = ({ item, featured }) => (
   <article
@@ -19,6 +19,7 @@ const Article = ({ item, featured }) => (
     >
       <BlogCover
         slug={item.slug}
+        image={item.coverImage}
         className="article-img absolute inset-0 transition-transform duration-[1200ms] ease-[var(--ease-out)] group-hover:scale-[1.05]"
       />
     </div>
@@ -50,6 +51,7 @@ const Article = ({ item, featured }) => (
 
 const BlogPage = () => {
   const root = useRef(null);
+  const posts = usePosts().filter((p) => p.published);
 
   useMotion(() => {
     gsap.utils.toArray(".article", root.current).forEach((el, i) => {

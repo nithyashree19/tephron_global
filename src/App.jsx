@@ -18,6 +18,7 @@ import TermsPage from "./components/TermsPage";
 import NotFound from "./components/NotFound";
 import ContactPage from "./components/ContactPage";
 import Footer from "./components/Footer";
+import AdminApp from "./admin/AdminApp";
 
 import { gsap, ScrollTrigger, prefersReducedMotion } from "./lib/motion";
 import { hasGallery } from "./lib/gallery";
@@ -121,10 +122,17 @@ const Shell = () => {
   );
 }
 
+// /admin has its own layout (sidebar, no site navbar or footer)
+const Root = () => {
+  const { pathname } = useLocation();
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
+  return isAdmin ? <AdminApp /> : <Shell />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
-      <Shell />
+      <Root />
     </BrowserRouter>
   );
 }

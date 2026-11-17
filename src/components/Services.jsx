@@ -10,9 +10,11 @@ import {
   FiArrowRight,
   FiChevronLeft,
   FiChevronRight,
+  FiLayers,
 } from "react-icons/fi";
 import { SectionHead } from "./ui";
-import { servicesData, hasPage } from "../lib/servicesData";
+import { hasPage } from "../lib/servicesData";
+import { useServices } from "../lib/servicesStore";
 import {
   gsap,
   clip,
@@ -52,9 +54,13 @@ const visuals = {
   "healthcare-admin": { icon: FiHeart, tint: "from-[#0a6a6a] to-[#082f35]" },
   "financial-ledger": { icon: FiFileText, tint: "from-[#4a2a9a] to-[#1a1040]" },
 };
-const services = servicesData.map((s) => ({ ...s, ...visuals[s.slug] }));
+// Services created in the admin get this default look
+const defaultVisual = { icon: FiLayers, tint: "from-[#0a3a8a] to-[#0a1d4a]" };
 
 const Services = ({ title = "Premium IT and Non-IT operations.", lead }) => {
+  const services = useServices()
+    .filter((s) => s.published)
+    .map((s) => ({ ...s, ...defaultVisual, ...visuals[s.slug] }));
   const root = useRef(null);
   const viewport = useRef(null);
   const track = useRef(null);

@@ -1,4 +1,6 @@
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
+import LoginPage from "./LoginPage";
+import { isSignedIn } from "../lib/adminAuth";
 import AdminLayout from "./AdminLayout";
 import DashboardPage from "./DashboardPage";
 import BlogList from "./BlogList";
@@ -35,10 +37,17 @@ const EditService = () => {
 };
 const NewService = () => <ServiceForm />;
 
-// No login yet: everything under /admin is open for now
+// Sends visitors who are not signed in to the login page
+const RequireAuth = ({ children }) => {
+  const location = useLocation();
+  if (!isSignedIn()) return <Navigate to="/tephron/global/login" replace state={{ from: location.pathname }} />;
+  return children;
+};
+
 const AdminApp = () => (
   <Routes>
-    <Route path="/admin" element={<AdminLayout />}>
+    <Route path="/tephron/global/login" element={<LoginPage />} />
+    <Route path="/admin" element={<RequireAuth><AdminLayout /></RequireAuth>}>
       <Route index element={<DashboardPage />} />
       <Route path="blog" element={<BlogList />} />
       <Route path="blog/new" element={<NewPost />} />

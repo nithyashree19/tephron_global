@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { NavLink, Outlet, Link, useLocation } from "react-router-dom";
-import { FiGrid, FiFileText, FiLayers, FiBriefcase, FiImage, FiPlus, FiGlobe, FiMenu, FiX, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
+import { NavLink, Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { FiGrid, FiFileText, FiLayers, FiBriefcase, FiImage, FiPlus, FiGlobe, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import { logout } from "../lib/adminAuth";
 import logo from "../assets/tephron-logo.jpg";
 import heroImg from "../assets/tephron-hero.webp";
 import ThemeToggle from "../components/ThemeToggle";
@@ -53,22 +54,19 @@ const NavList = ({ compact = false, glide = false, navRef, indicatorRef, onNavig
         title={compact ? label : undefined}
         onClick={onNavigate}
         className={({ isActive }) =>
-          `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] transition-colors focus-visible:outline-2 focus-visible:outline-accent ${
-            compact ? "justify-center" : ""
-          } ${
-            isActive
-              ? glide
-                ? "font-medium text-accent"
-                : "bg-accent-soft font-medium text-accent"
-              : "text-muted hover:bg-bg-alt hover:text-fg"
+          `relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] transition-colors focus-visible:outline-2 focus-visible:outline-accent ${compact ? "justify-center" : ""
+          } ${isActive
+            ? glide
+              ? "font-medium text-accent"
+              : "bg-accent-soft font-medium text-accent"
+            : "text-muted hover:bg-bg-alt hover:text-fg"
           }`
         }
       >
         <Icon aria-hidden="true" size={18} className="shrink-0" />
         <span
-          className={`whitespace-nowrap transition-[opacity,width] duration-300 ${
-            compact ? "w-0 overflow-hidden opacity-0" : "opacity-100"
-          }`}
+          className={`whitespace-nowrap transition-[opacity,width] duration-300 ${compact ? "w-0 overflow-hidden opacity-0" : "opacity-100"
+            }`}
         >
           {label}
         </span>
@@ -79,6 +77,12 @@ const NavList = ({ compact = false, glide = false, navRef, indicatorRef, onNavig
 
 const AdminLayout = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const signOut = () => {
+    logout();
+    navigate("/tephron/global/login", { replace: true });
+  };
   // The sidebar is always full width and fixed in place
   const collapsed = false;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -209,13 +213,20 @@ const AdminLayout = () => {
           <NavList compact={collapsed} glide navRef={navRef} indicatorRef={indicatorRef} />
         </div>
 
-        <div className="mt-auto px-3 pb-5">
+        <div className="mt-auto space-y-1 px-3 pb-5">
+          <button
+            type="button"
+            onClick={signOut}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-bg-alt hover:text-fg"
+          >
+            <FiLogOut aria-hidden="true" size={18} className="shrink-0" />
+            <span className="whitespace-nowrap">Sign out</span>
+          </button>
           <Link
             to="/"
             title={collapsed ? "View website" : undefined}
-            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-bg-alt hover:text-fg ${
-              collapsed ? "justify-center" : ""
-            }`}
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] text-muted transition-colors hover:bg-bg-alt hover:text-fg ${collapsed ? "justify-center" : ""
+              }`}
           >
             <FiGlobe aria-hidden="true" size={18} className="shrink-0" />
             <span className={`whitespace-nowrap transition-opacity duration-300 ${collapsed ? "w-0 opacity-0" : "opacity-100"}`}>

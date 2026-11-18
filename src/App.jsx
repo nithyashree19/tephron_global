@@ -125,7 +125,7 @@ const Shell = () => {
 // /admin has its own layout (sidebar, no site navbar or footer)
 const Root = () => {
   const { pathname } = useLocation();
-  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
+  const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/") || pathname === "/tephron/global/login";
   return isAdmin ? <AdminApp /> : <Shell />;
 };
 
